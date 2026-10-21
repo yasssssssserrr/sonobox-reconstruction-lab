@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f5f7">
+  <meta name="description" content="Explore tracked ultrasound, reconstruct visible cortical echoes, compare two supplied calibrations, and inspect STL surfaces interactively.">
+  <title>SonoBox · Reconstruction Lab</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="apple-design.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+<svg class="svg-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+ <symbol id="i-cube" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9M8 5.3l8 4.5"/></symbol>
+ <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></symbol>
+ <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+ <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7V5Z"/></symbol>
+ <symbol id="i-fit" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6M8 8h8v8H8z"/></symbol>
+ <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 7h5l2-3h4l2 3h5v13H3V7Z"/><circle cx="12" cy="13" r="4"/></symbol>
+ <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 3v7h7"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+ <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></symbol>
+ <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+ <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+ <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z"/></symbol>
+</defs></svg>
+<header class="site-header">
+ <a href="#explorer" class="brand" aria-label="SonoBox home"><span class="brand-mark"><svg><use href="#i-cube"/></svg></span><strong>SonoBox<span class="brand-divider">/</span><span class="brand-sub">Reconstruction Lab</span></strong></a>
+ <nav aria-label="Main navigation"><a class="active" href="#explorer">Explorer</a><button id="method-nav">How it works</button><button id="data-nav">Data &amp; exports</button></nav>
+ <div class="header-tools"><span class="research-badge"><span class="status-dot"></span> Research demo</span><button id="appearance-toggle" class="appearance-button" aria-label="Use dark appearance" title="Use dark appearance"><svg><use href="#i-moon"/></svg></button></div>
+</header>
+<main id="explorer">
+ <section class="intro">
+  <div><p class="eyebrow"><span class="tiny-line"></span> SPATIAL RECONSTRUCTION</p><h1>A new dimension <span>of ultrasound.</span></h1><p class="intro-copy">Explore a sweep in 3D. Trace each frame to the surface it creates.</p></div>
+  <button class="button secondary" id="open-stl"><svg><use href="#i-upload"/></svg>Open your STL<span class="keyhint">.stl</span></button>
+ </section>
+ <div class="workspace">
+  <aside class="controls-panel panel" aria-label="Reconstruction settings">
+   <section class="control-section">
+    <div class="section-heading"><span class="step">01</span><h2>Choose a sweep</h2></div>
+    <div class="sweep-options" id="sweep-options">
+     <button class="sweep-option selected" data-case="192514" aria-pressed="true"><span class="sweep-preview"><img src="assets/192514/frames/000304.png" alt=""></span><span><strong>Sweep 192514</strong><small>415 usable source frames</small></span><span class="radio-dot"></span></button>
+     <button class="sweep-option" data-case="192840" aria-pressed="false"><span class="sweep-preview"><img src="assets/192840/frames/000124.png" alt=""></span><span><strong>Sweep 192840</strong><small>253 usable source frames</small></span><span class="radio-dot"></span></button>
+    </div>
+    <p class="control-note">64 original frames per sweep are available for playback and browser previews.</p>
+   </section>
+   <section class="control-section" id="calibration-settings">
+    <div class="section-heading"><span class="step">02</span><h2>Calibration</h2><button class="info-button" id="matrix-info" aria-label="About the calibration matrices"><svg><use href="#i-info"/></svg></button></div>
+    <div class="segmented" id="matrix-options" aria-label="Calibration matrix"><button data-matrix="matrix_1" class="selected" aria-pressed="true">Matrix 1</button><button data-matrix="matrix_2" aria-pressed="false">Matrix 2</button><button data-matrix="both" aria-pressed="false">Compare</button></div>
+    <div class="matrix-legend"><span><i class="legend-dot mint"></i>Matrix 1</span><span><i class="legend-dot amber"></i>Matrix 2</span></div>
+   </section>
+   <section class="control-section" id="preview-settings">
+    <div class="section-heading"><span class="step">03</span><h2>Reconstruct a preview</h2></div>
+    <p class="preview-help">See how the sampled frames come together in three dimensions.</p>
+    <button class="button primary" id="reconstruct" disabled><svg><use href="#i-play"/></svg><span>Reconstruct preview</span></button>
+    <details class="advanced-settings" id="advanced-settings"><summary>Preview settings</summary><div class="advanced-content">
+    <div class="setting-grid"><label for="sample-count">Sampled frames<select id="sample-count"><option value="16">16 frames</option><option value="32">32 frames</option><option value="64" selected>64 frames</option></select></label><label for="voxel-size">Voxel size<select id="voxel-size"><option value="0.8">0.8 mm</option><option value="1" selected>1.0 mm</option><option value="1.5">1.5 mm</option><option value="2">2.0 mm</option></select></label></div>
+    <div class="range-label"><label for="threshold">Cortex probability</label><output id="threshold-value" for="threshold">0.50</output></div><input type="range" id="threshold" min="0.1" max="0.9" step="0.05" value="0.5">
+    <p class="control-note">Applies to the overlay, points and next preview. The full-sweep surface stays at 0.50.</p>
+    </div></details>
+    <div class="progress-box" id="reconstruction-progress" hidden><div><span id="progress-text">Preparing frames…</span><button id="cancel-reconstruction">Cancel</button></div><progress id="progress-bar" max="100" value="0"></progress></div>
+    <button id="restore-full" class="text-button" hidden>Return to full-sweep surface <span>↗</span></button>
+   </section>
+   <section class="control-section layers-section">
+    <div class="section-heading"><h2>Scene layers</h2></div>
+    <label class="check-row"><span>Reconstructed surface</span><input id="show-surface" type="checkbox" checked></label>
+    <label class="check-row"><span>Accumulating cortex points</span><input id="show-points" type="checkbox"></label>
+    <label class="check-row"><span>Tracked image plane</span><input id="show-plane" type="checkbox" checked></label>
+    <label class="check-row"><span>Scan trajectory</span><input id="show-path" type="checkbox"></label>
+   </section>
+  </aside>
+  <section class="viewer-panel panel" aria-label="Interactive 3D viewer">
+   <div class="viewer-heading"><div><span class="status-dot"></span><h2 id="viewer-title">Cortical surface</h2></div><span id="surface-kind" class="small-tag">FULL SWEEP</span></div>
+   <div class="viewport" id="viewport">
+    <div class="scene-badge"><span class="legend-dot mint" id="scene-dot"></span><span id="scene-label">Matrix 1 · 0.3 mm voxels</span></div>
+    <div class="view-toolbar" aria-label="Camera and display controls"><button id="fit-camera" title="Fit model" aria-label="Fit model"><svg><use href="#i-fit"/></svg></button><span></span><button data-view="front" title="Front view" aria-label="Front view">Front</button><button data-view="top" title="Top view" aria-label="Top view">Top</button><button data-view="side" title="Side view" aria-label="Side view">Side</button><span></span><button id="auto-rotate" title="Auto rotate" aria-label="Auto rotate" aria-pressed="false"><svg><use href="#i-reset"/></svg></button><button id="capture" title="Save a PNG screenshot" aria-label="Save a PNG screenshot"><svg><use href="#i-camera"/></svg></button></div>
+    <div class="viewer-loading" id="viewer-loading"><span class="spinner"></span><span id="loading-text">Loading the reconstruction…</span></div>
+    <div class="webgl-fallback" id="webgl-fallback" hidden><h3>3D rendering is unavailable</h3><p>Enable hardware acceleration or use a WebGL 2 browser. You can still inspect frames and download the STL.</p></div>
+    <div class="drop-target" id="drop-target" hidden><svg><use href="#i-upload"/></svg><strong>Drop an STL to explore</strong><span>The file stays in your browser.</span></div>
+    <div class="viewport-bottom"><span class="navigation-hint">Drag to orbit <b>·</b> Scroll to zoom <b>·</b> Right-drag to pan</span><div class="scale-bar"><span id="scale-label">20 mm</span><i id="scale-line"></i></div></div>
+   </div>
+   <div class="viewer-footer"><div class="geometry-stats"><span><strong id="triangle-count">—</strong> triangles</span><span id="model-dimensions">— mm</span></div><div class="material-controls"><label><input type="checkbox" id="wireframe">Wireframe</label><label for="opacity">Opacity</label><input id="opacity" type="range" min="0.15" max="1" step="0.05" value="1" aria-label="Surface opacity"></div></div>
+   <div class="surface-caption"><svg><use href="#i-info"/></svg><p id="surface-caption">A reconstruction of predicted visible cortical echoes. It represents observed surfaces, not a filled anatomical bone.</p><a id="download-stl" class="download-button" href="assets/192514/matrix_1.stl" download="SonoBox_192514_Matrix1.stl"><svg><use href="#i-download"/></svg>STL</a></div>
+  </section>
+  <aside class="source-panel panel" aria-label="Ultrasound frame viewer">
+   <div class="source-heading"><div><p class="eyebrow">SOURCE IMAGE</p><h2>Inside the sweep</h2></div><span class="small-tag">B-MODE</span></div>
+   <div class="source-image-wrap"><canvas id="source-image" width="254" height="512" aria-label="Original ultrasound image with optional predicted cortical echo overlay"></canvas><span id="image-label">ORIGINAL + PREDICTION</span></div>
+   <div class="source-details"><div><span>Original frame</span><strong id="original-frame">—</strong></div><div><span>Relative time</span><strong id="frame-time">— s</strong></div></div>
+   <label class="check-row source-overlay"><span><i class="legend-dot mint"></i>Predicted cortex overlay</span><input type="checkbox" id="show-overlay" checked></label>
+   <div class="source-rule"></div><div class="source-details"><div><span>Pixel spacing</span><strong>0.157447 mm</strong></div><div><span>Original image</span><strong>254 × 512 px</strong></div></div>
+   <p class="source-note" id="source-note">Source pixels and tracking are preserved. The overlay is a model prediction, pending further human annotation.</p>
+  </aside>
+  <section class="timeline-panel panel" aria-label="Sweep playback">
+   <div class="timeline-header"><div class="timeline-title"><button id="play-pause" class="play-button" aria-label="Play sweep"><svg><use href="#i-play"/></svg></button><div><h2>Explore the sequence</h2><p id="timeline-description">64 display frames · sweep 192514</p></div></div><span class="playback-note">Review playback · 8 fps</span><span id="frame-position" class="mono">32 / 64</span></div>
+   <input type="range" id="frame-slider" min="0" max="63" value="31" step="1" aria-label="Ultrasound frame">
+   <div class="filmstrip" id="filmstrip"></div>
+  </section>
+ </div>
+ <section class="method-strip"><div class="method-lead"><span class="eyebrow">THE RECONSTRUCTION PATH</span><strong>Real frames. Fixed calibration. Spatial context.</strong></div><div class="method-flow"><span><i>01</i> B-mode + tracking</span><b>→</b><span><i>02</i> nnU-Net cortex</span><b>→</b><span><i>03</i> Volume fusion</span><b>→</b><span><i>04</i> Surface + STL</span></div><button id="method-more" aria-label="Read how reconstruction works"><svg><use href="#i-arrow"/></svg></button></section>
+</main>
+<footer class="site-footer"><span>SonoBox <span class="muted">/</span> Tracked ultrasound reconstruction</span><span>Research snapshot · 21 October 2026 <span class="muted">/</span> <button id="provenance-link">View provenance</button></span></footer>
+<input type="file" id="stl-input" accept=".stl" hidden>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<dialog id="details-dialog"><div class="dialog-top"><p class="eyebrow">SONOBOX / RECONSTRUCTION LAB</p><button id="close-dialog" aria-label="Close details"><svg><use href="#i-close"/></svg></button></div><div id="dialog-content"></div></dialog>
+</body>
+</html>
