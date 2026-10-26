@@ -11,6 +11,13 @@ An interactive website for the SonoBox tracked ultrasound reconstruction project
 - A real browser-worker reconstruction preview: 16/32/64 sampled frames, 0.8/1/1.5/2 mm voxels, adjustable probability threshold, trilinear splatting of **all** image pixels (including background sampling support), Gaussian-normalized compounding and a thresholded marching-cubes surface. This coarser sampled preview is distinct from the full-sweep 0.3 mm exports.
 - Browser-local ASCII/binary STL import via file picker or drag/drop. STL unit metadata is absent, so custom files show original model units. No file is posted to a backend.
 - Responsive layout, labeled controls, keyboard-operable inputs, cancelable computation and a WebGL fallback that retains image playback and downloads.
+- An interactive project anatomy: a cutaway scan bench with a moving probe, original-image monitor and calibrated image planes. Four stages connect acquisition, nnU-Net predictions, supported compounding and partial-surface export. Sweep, calibration and frame controls stay linked to the reconstruction workspace.
+
+## Project anatomy
+
+The [Anatomy kit](https://github.com/wheresryan22/anatomy) supplies the isometric rendering and geometry audit for the 69-part instrument. The bench is schematic. Its image planes and sparse echo marks are derived from the recorded poses, supplied calibrations and cached probabilities already in this site. Both calibrations share one rigid presentation transform and uniform scale per sweep. The monitor overlay retains every original-grid pixel above 0.5; the spatial marks are sampled for readability. Full surfaces remain available in the original STL viewer.
+
+The four stages use native buttons, a labeled frame slider and a pausable walkthrough. Animation pauses when the illustration is offscreen, and reduced motion starts with a still illustration. The SVG explanation also works without WebGL. Generation and scientific presentation decisions are recorded in [docs/project-anatomy.md](docs/project-anatomy.md). The build regenerates `dist/project-anatomy.svg` and `dist/assets/project-anatomy.json` from the frozen browser assets.
 
 ## Interface design
 
@@ -55,10 +62,11 @@ The model outputs are predictions, not new human reference annotations. The surf
 
 ```sh
 npm test
+npm run test:anatomy
 npm run test:browser
 ```
 
-Run the local server before the browser suite. Static checks verify 128 PNG hashes and float32 probability arrays, four unchanged STL hashes and triangle counts, calibration units, source-frame transforms, trilinear support conservation, Gaussian impulse conservation/symmetry and per-file hosting sizes. Browser checks exercise both calibrations, comparison, original frame mapping, overlay and playback, real reconstruction, physical-coordinate STL exports, ASCII/binary import, malformed files, case switching, mobile overflow, non-WebGL fallback, persistent appearance, rapid calibration selection, spring velocity continuity and reduced-motion keyboard dialogs. Screenshots and deployment evidence are in the ignored `.artifacts/` directory.
+Run the local server before the browser suite. Static checks verify 128 PNG hashes and float32 probability arrays, four unchanged STL hashes and triangle counts, calibration units, source-frame transforms, the illustration's source-frame and prediction-count bindings, trilinear support conservation, Gaussian impulse conservation/symmetry and per-file hosting sizes. The Anatomy audit verifies instrument clearances, support and painter order throughout probe travel. Browser checks exercise both calibrations, comparison, original frame mapping, overlay and playback, real reconstruction, physical-coordinate STL exports, ASCII/binary import, malformed files, case switching, mobile overflow, non-WebGL fallback, persistent appearance, rapid calibration selection, spring velocity continuity, reduced-motion keyboard dialogs and the linked illustration. Screenshots and deployment evidence are in the ignored `.artifacts/` directory.
 
 ## GitHub Pages
 
@@ -80,4 +88,4 @@ $env:BASE_URL='http://127.0.0.1:4317/sonobox-reconstruction-lab/'
 npm run test:browser
 ```
 
-Third-party dependency: Three.js 0.180.0, MIT license, shipped as `dist/vendor/THREE-LICENSE.txt`. RecON is linked as an interaction reference; its branding, code, images and datasets are not bundled.
+Third-party dependencies: Three.js 0.180.0, MIT license, shipped as `dist/vendor/THREE-LICENSE.txt`; Anatomy, MIT, copyright 2026 Ryan, shipped as `dist/vendor/ANATOMY-LICENSE.txt`. The exact Anatomy source needed to regenerate and audit the illustration is in `tools/anatomy-kit/`. RecON is linked as an interaction reference; its branding, code, images and datasets are not bundled.

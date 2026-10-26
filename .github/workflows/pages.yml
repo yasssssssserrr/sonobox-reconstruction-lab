@@ -29,6 +29,8 @@ jobs:
         run: npm run build
       - name: Verify source data and reconstruction integrity
         run: npm test
+      - name: Audit illustrated instrument geometry
+        run: npm run test:anatomy
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website

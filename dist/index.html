@@ -8,8 +8,11 @@
   <title>SonoBox · Reconstruction Lab</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="apple-design.css">
+  <link rel="stylesheet" href="anatomy-kit.css">
+  <link rel="stylesheet" href="project-anatomy.css">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
   <script type="module" src="app.js"></script>
+  <script type="module" src="project-anatomy.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#workspace">Skip to reconstruction workspace</a>
@@ -33,12 +36,12 @@
 </defs></svg>
 <header class="site-header">
  <a href="#explorer" class="brand" aria-label="SonoBox home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-cube"/></svg></span><strong>SonoBox<span class="brand-divider">/</span><span class="brand-sub">Reconstruction Lab</span></strong></a>
- <nav aria-label="Main navigation"><a class="active" href="#explorer" aria-current="page">Explorer</a><button id="method-nav">How it works</button><button id="data-nav">Data &amp; exports</button></nav>
+ <nav aria-label="Main navigation"><a class="active" href="#explorer" aria-current="page">Explorer</a><a href="#project-anatomy">Project anatomy</a><button id="method-nav">How it works</button><button id="data-nav">Data &amp; exports</button></nav>
  <div class="header-tools"><span class="research-badge"><span class="status-dot"></span> Research demo</span><button id="appearance-toggle" class="appearance-button" aria-label="Use dark appearance" title="Use dark appearance"><svg><use href="#i-moon"/></svg></button></div>
 </header>
 <main id="explorer">
  <section class="intro">
-  <div><p class="eyebrow"><span class="tiny-line"></span> TRACKED ULTRASOUND / INTERACTIVE LAB</p><h1>Ultrasound, <span>reconstructed.</span></h1><p class="intro-copy">From a recorded sweep to a surface you can explore. Every frame in context.</p></div>
+  <div><p class="eyebrow"><span class="tiny-line"></span> TRACKED ULTRASOUND / INTERACTIVE LAB</p><h1>Ultrasound, <span>reconstructed.</span></h1><p class="intro-copy">From a recorded sweep to a surface you can explore. Every frame in context. <a href="#project-anatomy">Explore the project anatomy&nbsp;↗</a></p></div>
   <div class="intro-actions"><button class="button secondary" id="open-stl"><svg aria-hidden="true"><use href="#i-upload"/></svg>Open your STL<span class="keyhint">.stl</span></button><span class="local-file-note">View locally. Your file stays with you.</span></div>
  </section>
  <div class="workspace-overview"><div><span class="status-dot"></span><strong>Reconstruction workspace</strong><span class="overview-divider">/</span><span>Recorded data</span></div><p><span><strong>02</strong> sweeps</span><span><strong>04</strong> full-sweep surfaces</span></p><button id="settings-toggle" class="settings-toggle" aria-label="Show reconstruction settings" aria-expanded="false" aria-controls="settings-panel"><strong>Reconstruction settings</strong><span id="settings-context">Sweep 192514</span><svg aria-hidden="true"><use href="#i-chevron-right"/></svg></button></div>
@@ -105,6 +108,28 @@
   </section>
  </div>
  <section class="method-strip"><div class="method-lead"><span class="eyebrow">THE RECONSTRUCTION PATH</span><strong>Real frames. Fixed calibration. Spatial context.</strong></div><div class="method-flow"><span><i>01</i> B-mode + tracking</span><b>→</b><span><i>02</i> nnU-Net cortex</span><b>→</b><span><i>03</i> Volume fusion</span><b>→</b><span><i>04</i> Surface + STL</span></div><button id="method-more" aria-label="Read how reconstruction works"><svg><use href="#i-arrow"/></svg></button></section>
+ <section class="project-anatomy" id="project-anatomy" aria-labelledby="anatomy-title" aria-busy="true" data-stage="0" tabindex="-1">
+  <header class="anatomy-heading"><div><p class="eyebrow"><span class="tiny-line"></span> PROJECT ANATOMY</p><h2 id="anatomy-title">From an echo to a surface.</h2><p>A cutaway view of the project. Follow a real frame through acquisition, segmentation and spatial reconstruction.</p></div><a href="#workspace">Return to the explorer ↗</a></header>
+  <div class="anatomy-card">
+   <div class="anatomy-art">
+    <div class="anatomy-corners"><span>FIG. 01 / TRACKED SWEEP</span><strong>One frame, in context</strong></div>
+    <div id="anatomy-drawing" class="project-instrument"><img src="project-anatomy.svg" width="960" height="610" loading="lazy" alt="Cutaway scanning bench with a rail-mounted ultrasound probe and source-image monitor. Interactive controls below follow a real recorded sweep."></div>
+    <div class="anatomy-art-footer"><span id="anatomy-sweep-count">415 usable frames · 64 displayed</span><output id="anatomy-progress" aria-label="Sampled frame position">32 / 64</output></div>
+   </div>
+   <div class="anatomy-explanation">
+    <div class="anatomy-stage-buttons" role="group" aria-label="Reconstruction stages"><button data-anatomy-stage="0" aria-pressed="true"><span>01</span>Acquire</button><button data-anatomy-stage="1" aria-pressed="false"><span>02</span>Segment</button><button data-anatomy-stage="2" aria-pressed="false"><span>03</span>Compound</button><button data-anatomy-stage="3" aria-pressed="false"><span>04</span>Export</button></div>
+    <h3 id="anatomy-step-title">Acquire a tracked sweep</h3>
+    <p id="anatomy-step-copy">Each B-mode image is paired with a recorded robot pose. Spatial calibration locates its image plane relative to the tool.</p>
+    <div class="anatomy-fact"><strong id="anatomy-fact">Image + tracking</strong><p id="anatomy-fact-detail">Original pixels, frame ID and timestamp stay together.</p></div>
+    <dl class="anatomy-readouts"><div><dt>Original frame</dt><dd id="anatomy-source-frame">000304</dd></div><div><dt>Relative time</dt><dd id="anatomy-time">—</dd></div><div><dt>Cortex pixels</dt><dd id="anatomy-pixels">—</dd></div><div><dt>Fixed cutoff</dt><dd>p &gt; 0.50</dd></div></dl>
+    <button id="anatomy-open-surface" class="button secondary anatomy-open">Inspect the full-sweep surface <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+   </div>
+   <fieldset id="anatomy-controls" class="anatomy-controls"><legend class="anatomy-sr">Explore the project illustration</legend><label>Sweep<select id="anatomy-case"><option value="192514">192514</option><option value="192840">192840</option></select></label><label>Fixed calibration<select id="anatomy-matrix"><option value="matrix_1">Matrix 1</option><option value="matrix_2">Matrix 2</option></select></label><label for="anatomy-frame">Source-frame position<input id="anatomy-frame" type="range" min="0" max="63" value="31" step="1"></label><button id="anatomy-tour" aria-pressed="true">Pause walkthrough</button></fieldset>
+  </div>
+  <p id="anatomy-comparison-note" class="anatomy-comparison-note" hidden>The explorer compares both matrices. This illustration follows Matrix 1; choose a single calibration to follow it in both views.</p>
+  <div class="anatomy-caption"><p>Blue shows recorded image planes; green shows predicted cortex. The instrument is schematic, and echo marks are drawn sparsely for clarity. Both matrices share the same display scale. Inspect the full-sweep mesh in the explorer.</p><a href="https://github.com/wheresryan22/anatomy" target="_blank" rel="noopener noreferrer">Illustrated with Anatomy ↗</a></div>
+  <p id="anatomy-announcement" class="anatomy-sr" role="status" aria-live="polite"></p>
+ </section>
 </main>
 <footer class="site-footer"><span>SonoBox <span class="muted">/</span> Tracked ultrasound reconstruction</span><span>Research snapshot · 21 October 2026 <span class="muted">/</span> <button id="provenance-link">View provenance</button></span></footer>
 <input type="file" id="stl-input" accept=".stl" hidden>

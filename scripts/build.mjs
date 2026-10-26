@@ -1,6 +1,7 @@
 import {mkdir,copyFile,readFile,writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import './build-anatomy.mjs';
 const site=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const from=path.join(site,'node_modules/three'),to=path.join(site,'dist/vendor');
 await mkdir(to,{recursive:true});
