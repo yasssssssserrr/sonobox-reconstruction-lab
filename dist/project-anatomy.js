@@ -80,7 +80,7 @@ async function initialize(){
  if(initializing)return initializing;
  initializing=(async()=>{
   try{
-   const [artResponse,dataResponse]=await Promise.all([fetch('./project-anatomy.svg'),fetch('./assets/project-anatomy.json')]);
+   const [artResponse,dataResponse]=await Promise.all([fetch('./project-anatomy.svg?v=20261029'),fetch('./assets/project-anatomy.json?v=20261029')]);
    if(!artResponse.ok||!dataResponse.ok)throw Error('The project illustration could not be loaded.');
    const [art,model]=await Promise.all([artResponse.text(),dataResponse.json()]);
    data=model;$('anatomy-drawing').innerHTML=art;svg=$('anatomy-drawing').querySelector('svg');theme();

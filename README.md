@@ -4,9 +4,9 @@ An interactive website for the SonoBox tracked ultrasound reconstruction project
 
 ## Explore
 
-- Two real sweeps: 192514 (415 usable frames) and 192840 (253).
+- Three real sweeps: 192514 (415 usable frames), 192619 (341) and 192840 (253).
 - Original B-mode images, cached float32 nnU-Net cortex probabilities, source-frame IDs, timestamps and tracked image planes. The browser package contains 64 uniform display frames per sweep, retaining original pixels and probability values.
-- Four unchanged full-sweep STL exports: Matrix 1 and Matrix 2 for each sweep, in their common physical coordinate frame within that sweep. Matrix comparison never independently centers or registers the two meshes.
+- Six full-sweep STL exports regenerated with the 29 October model: Matrix 1 and Matrix 2 for each sweep, in their common physical coordinate frame within that sweep. Matrix comparison never independently centers or registers the two meshes.
 - Orbit, zoom, pan, view presets, opacity, wireframe, accumulating sample points, scan trajectories, screenshots and STL downloads.
 - A real browser-worker reconstruction preview: 16/32/64 sampled frames, 0.8/1/1.5/2 mm voxels, adjustable probability threshold, trilinear splatting of **all** image pixels (including background sampling support), Gaussian-normalized compounding and a thresholded marching-cubes surface. This coarser sampled preview is distinct from the full-sweep 0.3 mm exports.
 - Browser-local ASCII/binary STL import via file picker or drag/drop. STL unit metadata is absent, so custom files show original model units. No file is posted to a backend.
@@ -43,6 +43,25 @@ The build copies the pinned Three.js modules and licenses from `node_modules` to
 
 ## Asset provenance
 
+The 29 October refresh uses the B-mode model refitted on **414 human masks**
+from all three displayed acquisitions (256 / 90 / 68 respectively). Its checkpoint
+SHA-256 is `0c6963cb4b5c238dd16f48078a293da3c14eab82b7e04c251c1538ead4f8ed49`.
+All three sweeps contributed to fitting; a different reviewed acquisition is
+required for held-out evaluation. Predictions are still model suggestions.
+
+Full-sweep reconstruction uses **1,009 eligible source images** in total, not
+the 192 images sampled for browser playback. Original 192514 indices 0–99 stay
+excluded. For 192619, only **0–340 inclusive** are used; **341–499** are owner-
+excluded garbage. The 192619 viewer ends at original frame 340. Both matrices
+use exactly the same retained images and common physical grid within a sweep.
+
+New STLs and probability chunks use `assets/20261029/` URLs to avoid mixing
+cached baseline assets with updated predictions. Original image paths remain
+stable because their pixels and PNG bytes are unchanged. The prior two-sweep
+manifest and its assets remain available as `assets/baseline-20261021.json`;
+the active interface and downloads use the refreshed model. The manifest and
+linked illustration have matching publication-seal identities.
+
 `dist/assets/datasets.json` records source acquisition hashes, original indices, tool poses, both supplied calibration matrices, float32 probability hashes, PNG hashes, checkpoint hash and the exact STL hashes/counts. The delivered site contains the generated example assets. Their generation belongs to the separate research repository; this website repository retains the frozen browser-ready copies and their integrity checks.
 
 Coordinates are millimetres in the first usable tool frame **within each sweep**:
@@ -56,7 +75,7 @@ Only calibration translations are converted from metres to millimetres. Scene ce
 
 Full-sweep exports use 0.3 mm voxels, Gaussian sigma 0.25 mm, minimum support 0.05 and cortex probability threshold 0.5. Browser previews retain the same physical placement and compounding idea, with fewer frames, a coarser grid, CPU accumulation and a cubic padded preview grid. Their surfaces need not match the full-resolution output. A coarse voxel can average away a thin echo: an empty preview at a high threshold is reported explicitly rather than replaced by fabricated geometry.
 
-The model outputs are predictions, not new human reference annotations. The surfaces reconstruct observed echo ribbons, not filled bone interiors. No independent 3D geometric, calibration or subject-generalization accuracy is established by this viewer. New annotation/retraining remains a separate pending experiment. No checkpoints, full probability volumes, source annotation archives, credentials or identifying local filesystem paths are part of the runtime assets.
+The model outputs are predictions, not new human reference annotations. The surfaces reconstruct observed echo ribbons, not filled bone interiors. No independent 3D geometric, calibration or subject-generalization accuracy is established by this viewer. Three-sweep refitting completed; annotation of other acquisitions and held-out evaluation remain necessary. No checkpoints, full probability volumes, source annotation archives, credentials or identifying local filesystem paths are part of the runtime assets.
 
 ## Verification
 
@@ -66,13 +85,13 @@ npm run test:anatomy
 npm run test:browser
 ```
 
-Run the local server before the browser suite. Static checks verify 128 PNG hashes and float32 probability arrays, four unchanged STL hashes and triangle counts, calibration units, source-frame transforms, the illustration's source-frame and prediction-count bindings, trilinear support conservation, Gaussian impulse conservation/symmetry and per-file hosting sizes. The Anatomy audit verifies instrument clearances, support and painter order throughout probe travel. Browser checks exercise both calibrations, comparison, original frame mapping, overlay and playback, real reconstruction, physical-coordinate STL exports, ASCII/binary import, malformed files, case switching, mobile overflow, non-WebGL fallback, persistent appearance, rapid calibration selection, spring velocity continuity, reduced-motion keyboard dialogs and the linked illustration. Screenshots and deployment evidence are in the ignored `.artifacts/` directory.
+Run the local server before the browser suite. Static checks verify 192 PNG hashes and float32 probability arrays, six STL hashes and triangle counts, the pinned new checkpoint, reviewed 192619 exclusions, calibration units, source-frame transforms, the illustration's source-frame and prediction-count bindings, trilinear support conservation, Gaussian impulse conservation/symmetry and per-file hosting sizes. The Anatomy audit verifies instrument clearances, support and painter order throughout probe travel. Browser checks exercise both calibrations, comparison, original frame mapping, overlay and playback, real reconstruction, physical-coordinate STL exports, ASCII/binary import, malformed files, all three cases, mobile overflow, non-WebGL fallback, persistent appearance, rapid calibration selection, spring velocity continuity, reduced-motion keyboard dialogs and the linked illustration. Dedicated 192619 checks cover the frame-340 endpoint, both downloadable STL hashes, shared comparison counts and synchronized Anatomy controls. Screenshots and deployment evidence are in the ignored `.artifacts/` directory.
 
 ## GitHub Pages
 
 The website is deployed from `main` by `.github/workflows/pages.yml`. The workflow installs the pinned dependencies, vendors Three.js, checks data integrity and deploys only `dist/` using GitHub Pages. Under repository Settings > Pages, the publishing source is **GitHub Actions**. Later pushes to `main` automatically update the website.
 
-This is a standalone website snapshot, with no research repository history, credentials, checkpoints, training data archives or local filesystem paths. Only the two example sweeps and their browser assets are included. Runtime URLs are relative, so the application supports the repository subdirectory used by project Pages. The research checkout and the existing private Sites deployment remain separate.
+This is a standalone website snapshot, with no research repository history, credentials, checkpoints, training data archives or local filesystem paths. The three example sweeps and their browser assets are included, with the earlier baseline assets retained for provenance. Runtime URLs are relative, so the application supports the repository subdirectory used by project Pages. The research checkout and the existing private Sites deployment remain separate.
 
 To check a Pages-style subdirectory locally in PowerShell:
 

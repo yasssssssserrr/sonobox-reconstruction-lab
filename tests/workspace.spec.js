@@ -2,6 +2,8 @@ import {test,expect} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 
 const datasets=JSON.parse(await readFile(new URL('../dist/assets/datasets.json',import.meta.url),'utf8'));
+const first=datasets.cases.find(c=>c.id==='192514');
+const combined=(first.meshes.matrix_1.triangles+first.meshes.matrix_2.triangles).toLocaleString('en-US');
 async function ready(page){
  await page.goto('./');
  await expect(page.locator('body')).toHaveAttribute('data-ready','true',{timeout:90000});
@@ -11,20 +13,20 @@ async function ready(page){
 test('expanded viewer preserves comparison and restores workspace with Escape',async({page})=>{
  await ready(page);
  await page.getByRole('button',{name:'Compare',exact:true}).click();
- await expect(page.locator('#triangle-count')).toHaveText('350,192');
+ await expect(page.locator('#triangle-count')).toHaveText(combined);
  const initial=await page.locator('#viewport').boundingBox();
  await page.getByRole('button',{name:'Expand 3D viewer',exact:true}).click();
  await expect(page.locator('#focus-viewer')).toHaveAttribute('aria-expanded','true');
  await expect(page.locator('#settings-panel')).toBeHidden();
  await expect(page.getByRole('complementary',{name:'Ultrasound frame viewer'})).toBeHidden();
  await expect.poll(async()=>Math.round((await page.locator('#viewport').boundingBox()).width)).toBeGreaterThan(initial.width+200);
- await expect(page.locator('#triangle-count')).toHaveText('350,192');
+ await expect(page.locator('#triangle-count')).toHaveText(combined);
  await page.screenshot({path:'.artifacts/workspace-expanded.png',fullPage:false});
  await page.keyboard.press('Escape');
  await expect(page.locator('#focus-viewer')).toHaveAttribute('aria-expanded','false');
  await expect(page.getByRole('button',{name:'Expand 3D viewer',exact:true})).toBeFocused();
  await expect(page.locator('#settings-panel')).toBeVisible();
- await expect(page.locator('#triangle-count')).toHaveText('350,192');
+ await expect(page.locator('#triangle-count')).toHaveText(combined);
 });
 
 test('frame buttons use sampled source indices, stop playback and respect endpoints',async({page})=>{
@@ -54,7 +56,7 @@ test('mobile settings, theme contrast and layout work across supported widths',a
  await page.getByRole('button',{name:'Show reconstruction settings',exact:true}).click();
  await expect(page.locator('#settings-panel')).toBeVisible();
  await page.getByRole('button',{name:'Matrix 2',exact:true}).click();
- await expect(page.locator('#triangle-count')).toHaveText('173,200');
+ await expect(page.locator('#triangle-count')).toHaveText(first.meshes.matrix_2.triangles.toLocaleString('en-US'));
  await page.keyboard.press('Escape');
  await expect(page.locator('#settings-panel')).toBeHidden();
  await expect(page.getByRole('button',{name:'Show reconstruction settings',exact:true})).toBeFocused();

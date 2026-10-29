@@ -1,5 +1,7 @@
 import {test,expect} from '@playwright/test';
 import {Spring} from '../dist/apple-ui.js';
+import {readFile} from 'node:fs/promises';
+const datasets=JSON.parse(await readFile(new URL('../dist/assets/datasets.json',import.meta.url),'utf8'));
 
 test('a moving spring reverses from its displayed value and velocity',()=>{
  const originalRAF=globalThis.requestAnimationFrame,originalCancel=globalThis.cancelAnimationFrame;
@@ -21,11 +23,11 @@ test('appearance persists, calibration controls retarget and details honor reduc
  await page.reload();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await expect(page.locator('body')).toHaveAttribute('data-ready','true',{timeout:90000});
  await page.getByRole('button',{name:'Use light appearance'}).click();
  await page.locator('#matrix-options').evaluate(el=>{for(const key of ['matrix_2','both','matrix_1'])el.querySelector(`[data-matrix="${key}"]`).click();});
- await expect(page.locator('[data-matrix="matrix_1"]')).toHaveAttribute('aria-pressed','true');
+ await expect(page.locator('#matrix-options [data-matrix="matrix_1"]')).toHaveAttribute('aria-pressed','true');
  await expect.poll(()=>page.locator('#matrix-options').evaluate(el=>{const indicator=el.querySelector('.segment-indicator').getBoundingClientRect(),selected=el.querySelector('[aria-pressed="true"]').getBoundingClientRect();return Math.abs(indicator.x-selected.x)+Math.abs(indicator.width-selected.width);})).toBeLessThan(.1);
  await page.emulateMedia({reducedMotion:'reduce',contrast:'more'});
  await page.getByRole('button',{name:'How it works',exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByRole('dialog')).toBeVisible();expect(await page.getByRole('dialog').evaluate(el=>getComputedStyle(el).transform)).toBe('none');
  await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();await expect(page.getByRole('button',{name:'How it works',exact:true})).toBeFocused();
  await page.getByLabel('Reconstructed surface',{exact:true}).uncheck();await page.getByLabel('Reconstructed surface',{exact:true}).check();
- await expect(page.locator('#triangle-count')).toHaveText('176,992');expect(errors).toEqual([]);
+ await expect(page.locator('#triangle-count')).toHaveText(datasets.cases.find(c=>c.id==='192514').meshes.matrix_1.triangles.toLocaleString('en-US'));expect(errors).toEqual([]);
 });

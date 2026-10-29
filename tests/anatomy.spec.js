@@ -21,7 +21,7 @@ test('project anatomy follows real sweep, frame and calibration selections in bo
  await page.locator('#anatomy-matrix').selectOption('matrix_2');
  await expect(page.locator('#matrix-options [data-matrix="matrix_2"]')).toHaveAttribute('aria-pressed','true');
  await expect(page.locator('#viewer-loading')).toBeHidden({timeout:90000});
- await expect(page.locator('#triangle-count')).toHaveText('105,602');
+ await expect(page.locator('#triangle-count')).toHaveText(manifest.cases.find(c=>c.id==='192840').meshes.matrix_2.triangles.toLocaleString('en-US'));
  const input=page.locator('#anatomy-frame');await input.focus();await input.press('End');
  const frame=manifest.cases.find(c=>c.id==='192840').frames[63];
  await expect(page.locator('#anatomy-source-frame')).toHaveText(String(frame.index).padStart(6,'0'));

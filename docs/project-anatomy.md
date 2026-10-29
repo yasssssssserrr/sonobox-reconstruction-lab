@@ -9,7 +9,7 @@ instrument, not a dimensional drawing of the acquisition robot.
 
 ## Truth and interaction
 
-Use the existing two frozen example sweeps, their 64 sampled frames, supplied
+Use all three 29 October example sweeps, their 64 sampled frames, supplied
 calibrations, original images and cached probabilities. Derive illustration
 points from pixels above 0.5; reduce point density for readability. Apply the
 existing physical transform, then a uniform presentation scale and proper
@@ -54,7 +54,7 @@ an eight-frame contact sheet checks spring motion.
 All 12 browser tests pass, including bidirectional workspace synchronization,
 native keyboard controls, reduced motion, 390/768/1024/1440 px layouts and
 the non-WebGL fallback. The mobile navigation anchor clears the sticky header.
-Data checks retain all 128 original PNG/probability hashes and four STL hashes,
+Data checks retain all 192 original PNG/probability hashes and six STL hashes,
 and compare illustrated frame IDs, times and foreground counts with the frozen
 manifest. Reproduce geometry checks with `npm run test:anatomy`; browser and
 visual checks require the local server.

@@ -51,8 +51,14 @@ compact web targets, with explicit labels and keyboard alternatives.
 
 ## Scientific presentation
 
-The browser demo still contains two sweeps, 64 sampled display frames each and
-four frozen full-sweep STLs. Clearly distinguish the browser preview from the
+The 29 October data refresh contains three sweeps, 64 sampled display frames
+each and six full-sweep STLs from the refitted model. Sweep 192619 retains only
+original frames 0–340; 341–499 are excluded. All three displayed sweeps contributed
+annotations to model fitting, so fitting-image scores are not held-out accuracy.
+Keep the existing interface structure, colors and typography. Announce async
+loading through a status region and busy state. Use versioned reconstruction
+URLs so a returning visitor cannot combine old cached surfaces with new data.
+Clearly distinguish the browser preview from the
 full-sweep surface. Cortical predictions are not human annotations, complete
 solid bones or independently validated geometry. Keep source-data provenance
 and export access visible. Do not add invented accuracy statistics or claims.
