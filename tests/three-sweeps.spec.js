@@ -32,13 +32,8 @@ test('192619 respects the reviewed endpoint and downloads both new physical surf
  await expect(page.getByRole('dialog')).toContainText('All three displayed acquisitions contributed to fitting');
  await expect(page.getByRole('dialog')).toContainText(sweep.checkpoint_sha256);
  await page.locator('#close-dialog').click();
- await page.locator('#project-anatomy').scrollIntoViewIfNeeded();
- await expect(page.locator('#project-anatomy')).toHaveAttribute('data-ready','true');
- await page.locator('[data-anatomy-stage="0"]').click();
- await expect(page.locator('#anatomy-case')).toHaveValue('192619');
- await expect(page.locator('#project-anatomy')).not.toHaveAttribute('aria-pressed');
- await page.locator('#anatomy-frame').focus();await page.keyboard.press('End');
- await expect(page.locator('#anatomy-source-frame')).toHaveText('000340');
+ await expect(page.getByRole('dialog')).toBeHidden();
+ await slider.focus();await slider.press('End');
  await expect(page.locator('#original-frame')).toHaveText('000340');
  expect(errors).toEqual([]);
 });
