@@ -38,10 +38,10 @@
 </header>
 <main id="explorer">
  <section class="intro">
-  <div><p class="eyebrow"><span class="tiny-line"></span> TRACKED ULTRASOUND / INTERACTIVE LAB</p><h1>Ultrasound, <span>reconstructed.</span></h1><p class="intro-copy">Three recorded sweeps, updated cortical predictions and two fixed calibrations.</p></div>
+  <div><p class="eyebrow"><span class="tiny-line"></span> TRACKED ULTRASOUND / INTERACTIVE LAB</p><h1>Ultrasound, <span>reconstructed.</span></h1><p class="intro-copy">Nine recorded sweeps, cortical predictions from a model fitted on three of them, and two fixed calibrations.</p></div>
   <div class="intro-actions"><button class="button secondary" id="open-stl"><svg aria-hidden="true"><use href="#i-upload"/></svg>Open your STL<span class="keyhint">.stl</span></button><span class="local-file-note">View locally. Your file stays with you.</span></div>
  </section>
- <div class="workspace-overview"><div><span class="status-dot"></span><strong>Reconstruction workspace</strong><span class="overview-divider">/</span><span>Updated 29 October</span></div><p><span><strong>03</strong> sweeps</span><span><strong>06</strong> full-sweep surfaces</span></p><button id="settings-toggle" class="settings-toggle" aria-label="Show reconstruction settings" aria-expanded="false" aria-controls="settings-panel"><strong>Reconstruction settings</strong><span id="settings-context">Sweep 192514</span><svg aria-hidden="true"><use href="#i-chevron-right"/></svg></button></div>
+ <div class="workspace-overview"><div><span class="status-dot"></span><strong>Reconstruction workspace</strong><span class="overview-divider">/</span><span>Updated 2 November</span></div><p><span><strong>09</strong> sweeps</span><span><strong>18</strong> full-sweep surfaces</span></p><button id="settings-toggle" class="settings-toggle" aria-label="Show reconstruction settings" aria-expanded="false" aria-controls="settings-panel"><strong>Reconstruction settings</strong><span id="settings-context">Sweep 192514</span><svg aria-hidden="true"><use href="#i-chevron-right"/></svg></button></div>
  <div class="workspace" id="workspace" tabindex="-1">
   <aside class="controls-panel panel" id="settings-panel" aria-label="Reconstruction settings">
    <section class="control-section">
@@ -50,8 +50,14 @@
      <button class="sweep-option selected" data-case="192514" aria-pressed="true"><span class="sweep-preview"><img src="assets/192514/frames/000304.png" alt="" width="254" height="512"></span><span><strong>Sweep 192514</strong><small>415 usable source frames</small></span><span class="radio-dot"></span></button>
      <button class="sweep-option" data-case="192619" aria-pressed="false"><span class="sweep-preview"><img src="assets/192619/frames/000167.png" alt="" width="254" height="512"></span><span><strong>Sweep 192619</strong><small>341 frames · original 0–340</small></span><span class="radio-dot"></span></button>
      <button class="sweep-option" data-case="192840" aria-pressed="false"><span class="sweep-preview"><img src="assets/192840/frames/000124.png" alt="" width="254" height="512"></span><span><strong>Sweep 192840</strong><small>253 usable source frames</small></span><span class="radio-dot"></span></button>
+     <button class="sweep-option" data-case="192754" aria-pressed="false"><span class="sweep-preview"><img src="assets/192754/frames/000173.png" alt="" width="254" height="512"></span><span><strong>Sweep 192754</strong><small>341 frames · test sweep</small></span><span class="radio-dot"></span></button>
+     <button class="sweep-option" data-case="192447" aria-pressed="false"><span class="sweep-preview"><img src="assets/192447/frames/000156.png" alt="" width="254" height="512"></span><span><strong>Sweep 192447</strong><small>308 frames · test sweep</small></span><span class="radio-dot"></span></button>
+     <button class="sweep-option" data-case="193948" aria-pressed="false"><span class="sweep-preview"><img src="assets/193948/frames/000536.png" alt="" width="254" height="512"></span><span><strong>Sweep 193948</strong><small>951 frames · test sweep</small></span><span class="radio-dot"></span></button>
+     <button class="sweep-option" data-case="194903" aria-pressed="false"><span class="sweep-preview"><img src="assets/194903/frames/000890.png" alt="" width="254" height="512"></span><span><strong>Sweep 194903</strong><small>1562 frames · test sweep</small></span><span class="radio-dot"></span></button>
+     <button class="sweep-option" data-case="184600" aria-pressed="false"><span class="sweep-preview"><img src="assets/184600/frames/000526.png" alt="" width="254" height="512"></span><span><strong>Sweep 184600</strong><small>658 frames · test sweep</small></span><span class="radio-dot"></span></button>
+     <button class="sweep-option" data-case="184849" aria-pressed="false"><span class="sweep-preview"><img src="assets/184849/frames/000555.png" alt="" width="254" height="512"></span><span><strong>Sweep 184849</strong><small>704 frames · test sweep</small></span><span class="radio-dot"></span></button>
     </div>
-    <p class="control-note">64 original frames per sweep are available for playback and browser previews.</p>
+    <p class="control-note">64 original frames per sweep are available for playback and browser previews. Test sweeps were not used to fit the model.</p>
    </section>
    <section class="control-section" id="calibration-settings">
     <div class="section-heading"><span class="step">02</span><h2>Calibration</h2><button class="info-button" id="matrix-info" aria-label="About the calibration matrices"><svg><use href="#i-info"/></svg></button></div>
@@ -107,7 +113,7 @@
  </div>
  <section class="method-strip"><div class="method-lead"><span class="eyebrow">THE RECONSTRUCTION PATH</span><strong>Real frames. Fixed calibration. Spatial context.</strong></div><div class="method-flow"><span><i>01</i> B-mode + tracking</span><b>→</b><span><i>02</i> nnU-Net cortex</span><b>→</b><span><i>03</i> Volume fusion</span><b>→</b><span><i>04</i> Surface + STL</span></div><button id="method-more" aria-label="Read how reconstruction works"><svg><use href="#i-arrow"/></svg></button></section>
 </main>
-<footer class="site-footer"><span>SonoBox <span class="muted">/</span> Tracked ultrasound reconstruction</span><span>Three-sweep model · 29 October 2026 <span class="muted">/</span> <button id="provenance-link">View provenance</button></span></footer>
+<footer class="site-footer"><span>SonoBox <span class="muted">/</span> Tracked ultrasound reconstruction</span><span>Three-sweep model · six test sweeps added 2 November 2026 <span class="muted">/</span> <button id="provenance-link">View provenance</button></span></footer>
 <input type="file" id="stl-input" accept=".stl" hidden>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <dialog id="details-dialog"><div class="dialog-top"><p class="eyebrow">SONOBOX / RECONSTRUCTION LAB</p><button id="close-dialog" aria-label="Close details"><svg><use href="#i-close"/></svg></button></div><div id="dialog-content"></div></dialog>

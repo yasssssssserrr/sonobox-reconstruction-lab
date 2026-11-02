@@ -4,9 +4,9 @@ An interactive website for the SonoBox tracked ultrasound reconstruction project
 
 ## Explore
 
-- Three real sweeps: 192514 (415 usable frames), 192619 (341) and 192840 (253).
+- Nine real sweeps. Three were used to fit the model: 192514 (415 usable frames), 192619 (341) and 192840 (253). Six were added on 2 November 2026 as test sweeps that were not used for fitting: 192754 (341 frames), 192447 (308), 193948 (951), 194903 (1,562), 184600 (658) and 184849 (704).
 - Original B-mode images, cached float32 nnU-Net cortex probabilities, source-frame IDs, timestamps and tracked image planes. The browser package contains 64 uniform display frames per sweep, retaining original pixels and probability values.
-- Six full-sweep STL exports regenerated with the 29 October model: Matrix 1 and Matrix 2 for each sweep, in their common physical coordinate frame within that sweep. Matrix comparison never independently centers or registers the two meshes.
+- Eighteen full-sweep STL exports made with the 29 October model: Matrix 1 and Matrix 2 for each sweep, in their common physical coordinate frame within that sweep. Matrix comparison never independently centers or registers the two meshes.
 - Orbit, zoom, pan, view presets, opacity, wireframe, accumulating sample points, scan trajectories, screenshots and STL downloads.
 - A real browser-worker reconstruction preview: 16/32/64 sampled frames, 0.8/1/1.5/2 mm voxels, adjustable probability threshold, trilinear splatting of **all** image pixels (including background sampling support), Gaussian-normalized compounding and a thresholded marching-cubes surface. This coarser sampled preview is distinct from the full-sweep 0.3 mm exports.
 - Browser-local ASCII/binary STL import via file picker or drag/drop. STL unit metadata is absent, so custom files show original model units. No file is posted to a backend.
@@ -35,6 +35,8 @@ Open **http://127.0.0.1:4317**. `dist/` is a complete static site after building
 The build copies the pinned Three.js modules and licenses from `node_modules` to `dist/vendor`, including worker-compatible addon imports. It does not require a runtime CDN. Set `PORT` to choose another local port. The small development server binds only to loopback and serves only `dist`.
 
 ## Asset provenance
+
+**Test sweeps (2 November 2026).** The six added sweeps have no human reference masks, so their predictions are unreviewed model suggestions and no accuracy score is given. Their frame ranges were chosen by inspecting pose curves and frame montages: probe-in-air, probe lift-off and post-contact settling frames are excluded, including interior dropouts in 194903 and 184849. The ranges are recorded per sweep as `retained_ranges` and `frame_selection` in `dist/assets/datasets.json`, and they have not been reviewed by the dataset owner. Spot checks show false positives on tissue surfaces or bright linear artifacts and some missed contours, and 184600 and 184849 show a different-looking scene from the forearm-phantom sweeps. The display images are lossless PNGs of the raw frames, and their assets live under `assets/20261102/`.
 
 The 29 October refresh uses the B-mode model refitted on **414 human masks**
 from all three displayed acquisitions (256 / 90 / 68 respectively). Its checkpoint

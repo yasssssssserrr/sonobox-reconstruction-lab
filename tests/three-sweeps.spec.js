@@ -8,7 +8,7 @@ async function ready(page){await page.goto('./');await expect(page.locator('body
 
 test('192619 respects the reviewed endpoint and downloads both new physical surfaces',async({page})=>{
  const errors=[];page.on('pageerror',error=>errors.push(error.message));await ready(page);
- await expect(page.locator('[data-case]')).toHaveCount(3);
+ await expect(page.locator('[data-case]')).toHaveCount(9);
  await page.locator('[data-case="192619"]').click();
  await expect(page.locator('#original-frame')).toHaveText('000167');
  await expect(page.locator('#source-note')).toContainText('341–499 excluded');
@@ -52,4 +52,24 @@ test('the additional sweep fits small screens, landscape and enlarged text',asyn
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
   }
  }
+});
+
+test('the six test sweeps are labelled as unfitted and show their retained frames',async({page})=>{
+ const errors=[];page.on('pageerror',error=>errors.push(error.message));await ready(page);
+ for(const c of manifest.cases.filter(c=>c.model_training_role.startsWith('Not used'))){
+  await page.locator(`[data-case="${c.id}"]`).click();
+  await expect(page.locator('#source-note')).toContainText('not used for model fitting');
+  await expect(page.locator('#timeline-description')).toContainText(`${c.eligible_frames} source frames`);
+  await expect(page.locator('#original-frame')).toHaveText(String(c.frames[31].index).padStart(6,'0'));
+  await expect(page.locator('#viewer-loading')).toBeHidden({timeout:90000});
+  await page.locator('#data-nav').click();
+  const dialog=page.getByRole('dialog');
+  await expect(dialog).toContainText(`${c.source_frames} acquired frames · ${c.eligible_frames} usable`);
+  await expect(dialog).toContainText('not been reviewed by the dataset owner');
+  await expect(dialog).toContainText('was not used for fitting');
+  await expect(dialog).toContainText(c.checkpoint_sha256);
+  await page.locator('#close-dialog').click();
+  await expect(dialog).toBeHidden();
+ }
+ expect(errors).toEqual([]);
 });
