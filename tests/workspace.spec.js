@@ -35,7 +35,7 @@ test('frame buttons use sampled source indices, stop playback and respect endpoi
  await page.getByRole('button',{name:'Next sampled frame',exact:true}).click();
  await expect(page.locator('#original-frame')).toHaveText(String(frames[32].index).padStart(6,'0'));
  await page.getByRole('button',{name:'Previous sampled frame',exact:true}).click();
- await expect(page.locator('#original-frame')).toHaveText('000304');
+ await expect(page.locator('#original-frame')).toHaveText(String(first.frames[31].index).padStart(6,'0'));
  for(const [position,disabled,enabled]of [[0,'Previous sampled frame','Next sampled frame'],[63,'Next sampled frame','Previous sampled frame']]){
   await page.locator('#frame-slider').evaluate((input,value)=>{input.value=String(value);input.dispatchEvent(new Event('input',{bubbles:true}));},position);
   await expect(page.getByRole('button',{name:disabled,exact:true})).toBeDisabled();

@@ -4,9 +4,9 @@ An interactive website for the SonoBox tracked ultrasound reconstruction project
 
 ## Explore
 
-- Nine real sweeps. Three were used to fit the model: 192514 (415 usable frames), 192619 (341) and 192840 (253). Six were added on 2 November 2026 as test sweeps that were not used for fitting: 192754 (341 frames), 192447 (308), 193948 (951), 194903 (1,562), 184600 (658) and 184849 (704).
+- Nine real sweeps of two forearm phantoms, each shown on its usable frames only. Six have human masks and were used to fit the final model: 192514 (380 usable frames), 192619 (350), 192840 (253), 193948 (726) and the big-phantom sweeps 184600 (662) and 184849 (782). Three have no human masks: 192447 (320), 192754 (350) and 194903 (806).
 - Original B-mode images, cached float32 nnU-Net cortex probabilities, source-frame IDs, timestamps and tracked image planes. The browser package contains 64 uniform display frames per sweep, retaining original pixels and probability values.
-- Eighteen full-sweep STL exports made with the 29 October model: Matrix 1 and Matrix 2 for each sweep, in their common physical coordinate frame within that sweep. Matrix comparison never independently centers or registers the two meshes.
+- Eighteen full-sweep STL exports made with the final model of 8 November 2026: Matrix 1 and Matrix 2 for each sweep, in their common physical coordinate frame within that sweep. Matrix comparison never independently centers or registers the two meshes.
 - Orbit, zoom, pan, view presets, opacity, wireframe, accumulating sample points, scan trajectories, screenshots and STL downloads.
 - A real browser-worker reconstruction preview: 16/32/64 sampled frames, 0.8/1/1.5/2 mm voxels, adjustable probability threshold, trilinear splatting of **all** image pixels (including background sampling support), Gaussian-normalized compounding and a thresholded marching-cubes surface. This coarser sampled preview is distinct from the full-sweep 0.3 mm exports.
 - Browser-local ASCII/binary STL import via file picker or drag/drop. STL unit metadata is absent, so custom files show original model units. No file is posted to a backend.
@@ -36,26 +36,9 @@ The build copies the pinned Three.js modules and licenses from `node_modules` to
 
 ## Asset provenance
 
-**Test sweeps (2 November 2026).** The six added sweeps have no human reference masks, so their predictions are unreviewed model suggestions and no accuracy score is given. Their frame ranges were chosen by inspecting pose curves and frame montages: probe-in-air, probe lift-off and post-contact settling frames are excluded, including interior dropouts in 194903 and 184849. The ranges are recorded per sweep as `retained_ranges` and `frame_selection` in `dist/assets/datasets.json`, and they have not been reviewed by the dataset owner. Spot checks show false positives on tissue surfaces or bright linear artifacts and some missed contours, and 184600 and 184849 show a different-looking scene from the forearm-phantom sweeps. The display images are lossless PNGs of the raw frames, and their assets live under `assets/20261102/`.
+**Final model (8 November 2026).** The predictions and surfaces come from the final B-mode nnU-Net, fitted on **685 human masks** from six sweeps (192514: 255, 192619: 90, 192840: 68, 193948: 63, 184600: 109, 184849: 100). Its checkpoint SHA-256 is `2803b36a96272221a7cf8a6418a98c1889a11a5e8c61ad275f6313b7e962494d`. Before it, four held-out models were each fitted without one sweep group and scored once on that group's masks: micro Dice 0.79–0.85 on the small phantom and 0.44–0.55 on the big phantom, where the model misses dim bone echoes. The final model itself has no independent score, and 192447, 192754 and 194903 have no human masks, so their predictions are unreviewed and unscored. All displayed masks remain model suggestions.
 
-The 29 October refresh uses the B-mode model refitted on **414 human masks**
-from all three displayed acquisitions (256 / 90 / 68 respectively). Its checkpoint
-SHA-256 is `0c6963cb4b5c238dd16f48078a293da3c14eab82b7e04c251c1538ead4f8ed49`.
-All three sweeps contributed to fitting; a different reviewed acquisition is
-required for held-out evaluation. Predictions are still model suggestions.
-
-Full-sweep reconstruction uses **1,009 eligible source images** in total, not
-the 192 images sampled for browser playback. Original 192514 indices 0–99 stay
-excluded. For 192619, only **0–340 inclusive** are used; **341–499** are owner-
-excluded garbage. The 192619 viewer ends at original frame 340. Both matrices
-use exactly the same retained images and common physical grid within a sweep.
-
-New STLs and probability chunks use `assets/20261029/` URLs to avoid mixing
-cached baseline assets with updated predictions. Original image paths remain
-stable because their pixels and PNG bytes are unchanged. The prior two-sweep
-manifest and its assets remain available as `assets/baseline-20261021.json`;
-the active interface and downloads use the refreshed model. The manifest and
-linked illustration have matching publication-seal identities.
+**Usable frames.** The recording software kept storing images and poses after the robot had finished each sweep, and some recordings also start before it. The dataset owner marked the usable frames of every sweep, and only those are reconstructed and displayed. They are recorded per sweep as `retained_ranges` in `dist/assets/datasets.json`; full-sweep reconstruction uses **4,629 usable source images** in total. The display images are lossless PNGs of the raw frames (existing PNGs with identical pixels are reused), and the probability chunks and STLs live under `assets/20261108/`. The older two-sweep manifest `assets/baseline-20261021.json` and its frames remain for reference; the superseded 29 October and 2 November assets were removed from the deployed site and remain in the Git history.
 
 `dist/assets/datasets.json` records source acquisition hashes, original indices, tool poses, both supplied calibration matrices, float32 probability hashes, PNG hashes, checkpoint hash and the exact STL hashes/counts. The delivered site contains the generated example assets. Their generation belongs to the separate research repository; this website repository retains the frozen browser-ready copies and their integrity checks.
 
@@ -79,7 +62,7 @@ npm test
 npm run test:browser
 ```
 
-Run the local server before the browser suite. Static checks verify 192 PNG hashes and float32 probability arrays, six STL hashes and triangle counts, the pinned new checkpoint, reviewed 192619 exclusions, calibration units, source-frame transforms, trilinear support conservation, Gaussian impulse conservation/symmetry and per-file hosting sizes. Browser checks exercise both calibrations, comparison, original frame mapping, overlay and playback, real reconstruction, physical-coordinate STL exports, ASCII/binary import, malformed files, all three cases, mobile overflow, non-WebGL fallback, persistent appearance, rapid calibration selection, spring velocity continuity, reduced-motion keyboard dialogs and the playback controls. Dedicated 192619 checks cover the frame-340 endpoint, both downloadable STL hashes and shared comparison counts. Screenshots and deployment evidence are in the ignored `.artifacts/` directory.
+Run the local server before the browser suite. Static checks verify 576 PNG hashes and float32 probability arrays, 18 STL hashes and triangle counts, the pinned final-model checkpoint, the usable frame ranges of all nine sweeps, calibration units, source-frame transforms, trilinear support conservation, Gaussian impulse conservation/symmetry and per-file hosting sizes. Browser checks exercise both calibrations, comparison, original frame mapping, overlay and playback, real reconstruction, physical-coordinate STL exports, ASCII/binary import, malformed files, all nine sweeps, mobile overflow, non-WebGL fallback, persistent appearance, rapid calibration selection, spring velocity continuity, reduced-motion keyboard dialogs and the playback controls. Dedicated 192619 checks cover the frame-349 endpoint, both downloadable STL hashes and shared comparison counts. Screenshots and deployment evidence are in the ignored `.artifacts/` directory.
 
 ## GitHub Pages
 

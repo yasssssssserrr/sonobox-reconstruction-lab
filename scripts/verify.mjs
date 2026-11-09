@@ -8,24 +8,29 @@ import {multiply4,transformPoint,splatPixel,gaussianInPlace} from '../dist/recon
 const site=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),dist=path.join(site,'dist');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const manifest=JSON.parse(await readFile(path.join(dist,'assets/datasets.json'),'utf8'));
-assert.equal(manifest.date,'2026-11-02');
-const trained=['192514','192619','192840'],tested=['192754','192447','193948','194903','184600','184849'];
-assert.deepEqual(manifest.cases.map(c=>c.id),[...trained,...tested]);
-assert.deepEqual(manifest.test_sweeps.ids,tested);assert.equal(manifest.test_sweeps.model_fitting,'none');
-assert.equal(manifest.model_training.annotated_images,414);
+assert.equal(manifest.date,'2026-11-08');
+const trained=['192514','192619','192840','193948','184600','184849'],unannotated=['192447','192754','194903'];
+assert.deepEqual(manifest.cases.map(c=>c.id),[...trained,...unannotated]);
+assert.deepEqual(manifest.model_training.sweeps,trained);assert.deepEqual(manifest.model_training.unannotated_sweeps,unannotated);
+assert.equal(manifest.model_training.annotated_images,685);
+assert.equal(manifest.cases.reduce((n,c)=>n+c.human_masks_in_training,0),685);
+// Usable frames given by the dataset owner (configs/retained_frames_data_for_vol_rec_3.json in the research repository).
+const usable={'184600':[[190,851]],'184849':[[17,139],[244,902]],'192447':[[0,319]],'192514':[[135,514]],'192619':[[0,349]],'192754':[[0,349]],'192840':[[0,252]],'193948':[[94,819]],'194903':[[134,939]]};
 assert.equal(manifest.model_training.epochs,35);
 assert.doesNotMatch(JSON.stringify(manifest),/(?:[A-Z]:[\\/]|glpat-|ghp_|gho_)/);
 let images=0,probs=0,stls=0;
 for(const dataset of manifest.cases){
- assert.equal(dataset.checkpoint_sha256,'0c6963cb4b5c238dd16f48078a293da3c14eab82b7e04c251c1538ead4f8ed49');
- assert.equal(dataset.eligible_frames,{'192514':415,'192619':341,'192840':253,'192754':341,'192447':308,'193948':951,'194903':1562,'184600':658,'184849':704}[dataset.id]);
- const prefix=trained.includes(dataset.id)?'assets/20261029/':'assets/20261102/';
+ assert.equal(dataset.checkpoint_sha256,'2803b36a96272221a7cf8a6418a98c1889a11a5e8c61ad275f6313b7e962494d');
+ assert.deepEqual(dataset.retained_ranges,usable[dataset.id]);
+ assert.equal(dataset.eligible_frames,usable[dataset.id].reduce((n,[a,b])=>n+b-a+1,0));
+ const prefix='assets/20261108/';
  assert.equal(dataset.eligible_frames+dataset.excluded_source_indices.length,dataset.source_frames);
  assert.equal(dataset.retained_ranges?.reduce((n,[a,b])=>n+b-a+1,0)??dataset.eligible_frames,dataset.eligible_frames);
  const excluded=new Set(dataset.excluded_source_indices);assert.ok(dataset.frames.every(f=>!excluded.has(f.index)),'a displayed frame lies in an excluded range');
- if(tested.includes(dataset.id))assert.match(dataset.model_training_role,/^Not used for model fitting/);
- assert.equal(dataset.last_eligible_index,{'192514':514,'192619':340,'192840':252,'192754':340,'192447':307,'193948':1003,'194903':2085,'184600':849,'184849':901}[dataset.id]);
- if(dataset.id==='192619')assert.deepEqual(dataset.excluded_source_indices,Array.from({length:159},(_,i)=>i+341));
+ assert.match(dataset.model_training_role,unannotated.includes(dataset.id)?/^Not used for model fitting/:/^Used to fit the final model/);
+ assert.equal(dataset.human_masks_in_training>0,trained.includes(dataset.id));
+ assert.equal(dataset.first_eligible_index,usable[dataset.id][0][0]);assert.equal(dataset.last_eligible_index,usable[dataset.id].at(-1)[1]);
+ if(dataset.id==='192619')assert.deepEqual(dataset.excluded_source_indices,Array.from({length:150},(_,i)=>i+350));
  assert.equal(dataset.frames.length,64);assert.equal(new Set(dataset.frames.map(f=>f.index)).size,64);
  assert.equal(dataset.frames[0].index,dataset.first_eligible_index);assert.equal(dataset.frames.at(-1).index,dataset.last_eligible_index);
  const all=Buffer.alloc(64*512*254*4);
@@ -54,4 +59,4 @@ assert.equal(impulse[4+11*(5+11*5)],impulse[6+11*(5+11*5)]);assert.ok(impulse[5+
 async function walk(dir){for(const entry of await readdir(dir,{withFileTypes:true})){const p=path.join(dir,entry.name);if(entry.isDirectory())await walk(p);else assert.ok((await stat(p)).size<25*1024**2,`Asset exceeds hosting limit: ${p}`);}}
 await walk(dist);
 for(const name of ['index.html','app.js','reconstruction-worker.js','vendor/three.module.js','vendor/three.core.js','vendor/addons/objects/MarchingCubes.js'])await stat(path.join(dist,name));
-console.log(JSON.stringify({status:'passed',original_png_hashes_checked:images,exact_float32_probability_arrays_checked:probs,unchanged_stl_hashes_and_triangle_counts_checked:stls,calibration_units_and_first_frame_transforms_checked:true,owner_reviewed_192619_exclusion_checked:true,no_displayed_frame_in_an_excluded_range_checked:true,trilinear_support_mass_conserved:true,gaussian_mass_and_symmetry_checked:true,all_assets_below_25_MiB:true},null,2));
+console.log(JSON.stringify({status:'passed',original_png_hashes_checked:images,exact_float32_probability_arrays_checked:probs,unchanged_stl_hashes_and_triangle_counts_checked:stls,calibration_units_and_first_frame_transforms_checked:true,usable_frame_ranges_checked:true,no_displayed_frame_in_an_excluded_range_checked:true,trilinear_support_mass_conserved:true,gaussian_mass_and_symmetry_checked:true,all_assets_below_25_MiB:true},null,2));
