@@ -8,8 +8,10 @@
   <title>SonoBox · Reconstruction Lab</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="apple-design.css">
+  <link rel="stylesheet" href="slice-viewer.css?v=20261109">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
   <script type="module" src="app.js?v=20261108"></script>
+  <script type="module" src="slice-viewer.js?v=20261109"></script>
 </head>
 <body>
 <a class="skip-link" href="#workspace">Skip to reconstruction workspace</a>
@@ -111,6 +113,36 @@
    <div class="filmstrip" id="filmstrip"></div>
   </section>
  </div>
+ <section class="slice-panel panel" id="slice-panel" aria-labelledby="slice-title" aria-busy="false">
+  <div class="slice-header">
+   <div><p class="eyebrow"><span class="tiny-line"></span> SLICE VIEWS · LIKE 3D SLICER</p><h2 id="slice-title">Bone mask in three planes</h2>
+   <p class="slice-intro">The final model's bone mask (orange) on the compounded ultrasound or on the aligned CT, on the sweep's own 0.3&nbsp;mm grid. Drag a slider or click a view to move the other two planes. The panel follows the sweep chosen above.</p></div>
+   <div class="slice-controls">
+    <div class="segmented" id="slice-matrix" aria-label="Calibration matrix for the slice views"><button data-value="matrix_1" class="selected" aria-pressed="true" aria-label="Slice views: Matrix 1">Matrix 1</button><button data-value="matrix_2" aria-pressed="false" aria-label="Slice views: Matrix 2">Matrix 2</button></div>
+    <div class="segmented" id="slice-background" aria-label="Background volume"><button data-value="ultrasound" class="selected" aria-pressed="true" aria-label="Slice background: ultrasound">Ultrasound</button><button data-value="ct" aria-pressed="false" aria-label="Slice background: CT">CT</button></div>
+    <label class="check-row slice-mask-row"><span><i class="legend-dot slice-orange"></i>Bone mask</span><input type="checkbox" id="slice-mask" checked></label>
+    <label class="slice-opacity-row"><span>Mask opacity</span><input type="range" id="slice-opacity" min="0.1" max="1" step="0.05" value="0.6" aria-label="Bone mask opacity"></label>
+   </div>
+  </div>
+  <div class="slice-grid">
+    <figure class="slice-view slice-red">
+     <figcaption><span class="slice-chip">R</span><span>At one depth</span><span class="mono" id="slice-red-position">—</span></figcaption>
+     <div class="slice-canvas-wrap"><canvas id="slice-red" role="img" data-title="At one depth" aria-label="At one depth"></canvas></div>
+     <input type="range" id="slice-red-slider" min="0" max="0" value="0" step="1" aria-label="At one depth: plane position">
+    </figure>
+    <figure class="slice-view slice-yellow">
+     <figcaption><span class="slice-chip">Y</span><span>Across the sweep</span><span class="mono" id="slice-yellow-position">—</span></figcaption>
+     <div class="slice-canvas-wrap"><canvas id="slice-yellow" role="img" data-title="Across the sweep" aria-label="Across the sweep"></canvas></div>
+     <input type="range" id="slice-yellow-slider" min="0" max="0" value="0" step="1" aria-label="Across the sweep: plane position">
+    </figure>
+    <figure class="slice-view slice-green">
+     <figcaption><span class="slice-chip">G</span><span>Along the sweep</span><span class="mono" id="slice-green-position">—</span></figcaption>
+     <div class="slice-canvas-wrap"><canvas id="slice-green" role="img" data-title="Along the sweep" aria-label="Along the sweep"></canvas></div>
+     <input type="range" id="slice-green-slider" min="0" max="0" value="0" step="1" aria-label="Along the sweep: plane position">
+    </figure>
+  </div>
+  <p class="slice-note"><span id="slice-status">The slice volumes load when this panel comes into view.</span> The CT is placed with the landmark-free rigid fit, so its position along the bone is known only to a few millimetres. The mask is unreviewed model output.</p>
+ </section>
  <section class="method-strip"><div class="method-lead"><span class="eyebrow">THE RECONSTRUCTION PATH</span><strong>Real frames. Fixed calibration. Spatial context.</strong></div><div class="method-flow"><span><i>01</i> B-mode + tracking</span><b>→</b><span><i>02</i> nnU-Net cortex</span><b>→</b><span><i>03</i> Volume fusion</span><b>→</b><span><i>04</i> Surface + STL</span></div><button id="method-more" aria-label="Read how reconstruction works"><svg><use href="#i-arrow"/></svg></button></section>
 </main>
 <footer class="site-footer"><span>SonoBox <span class="muted">/</span> Tracked ultrasound reconstruction</span><span>Final model · 685 human masks · usable frames, 8 November 2026 <span class="muted">/</span> <button id="provenance-link">View provenance</button></span></footer>

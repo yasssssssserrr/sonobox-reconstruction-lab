@@ -56,7 +56,23 @@ assert.ok(Math.abs(total(weights)-1)<1e-7);assert.ok(Math.abs(total(sum)-.8)<1e-
 assert.equal(weights[1+n*(2+n*1)],.09375);assert.equal(weights[2+n*(3+n*2)],.09375);
 const impulse=new Float32Array(11**3);impulse[5+11*(5+11*5)]=1;gaussianInPlace(impulse,11,.7);assert.ok(Math.abs(total(impulse)-1)<1e-6);
 assert.equal(impulse[4+11*(5+11*5)],impulse[6+11*(5+11*5)]);assert.ok(impulse[5+11*(5+11*5)]>impulse[4+11*(5+11*5)]);
+// Slice views: 18 cropped volumes (nine sweeps x two matrices) of ultrasound, bone mask and resampled CT.
+const slices=JSON.parse(await readFile(path.join(dist,'assets/20261108/slices.json'),'utf8'));
+assert.equal(slices.volumes.length,18);
+assert.deepEqual([...new Set(slices.volumes.map(v=>v.sweep))].sort(),manifest.cases.map(c=>c.id).sort());
+let sliceFiles=0;
+for(const v of slices.volumes){
+ const voxels=v.shape_depth_across_along.reduce((a,b)=>a*b,1);assert.equal(v.voxel_mm,0.3);
+ assert.deepEqual(Object.keys(v.files).sort(),['ct','mask','ultrasound']);
+ for(const [name,info] of Object.entries(v.files)){
+  assert.ok(info.file.startsWith(`assets/20261108/slices/${v.sweep}/${v.matrix}/`));
+  const bytes=await readFile(path.join(dist,info.file));assert.equal(hash(bytes),info.sha256);
+  const raw=gunzipSync(bytes);assert.equal(raw.length,voxels);assert.equal(hash(raw),info.uncompressed_sha256);
+  if(name==='mask'){let ones=0;for(let i=0;i<raw.length;i++){const b=raw[i];assert.ok(b<=1);ones+=b;}assert.equal(ones,v.mask_voxels);assert.ok(ones>0);}
+  sliceFiles++;
+ }
+}
 async function walk(dir){for(const entry of await readdir(dir,{withFileTypes:true})){const p=path.join(dir,entry.name);if(entry.isDirectory())await walk(p);else assert.ok((await stat(p)).size<25*1024**2,`Asset exceeds hosting limit: ${p}`);}}
 await walk(dist);
-for(const name of ['index.html','app.js','reconstruction-worker.js','vendor/three.module.js','vendor/three.core.js','vendor/addons/objects/MarchingCubes.js'])await stat(path.join(dist,name));
-console.log(JSON.stringify({status:'passed',original_png_hashes_checked:images,exact_float32_probability_arrays_checked:probs,unchanged_stl_hashes_and_triangle_counts_checked:stls,calibration_units_and_first_frame_transforms_checked:true,usable_frame_ranges_checked:true,no_displayed_frame_in_an_excluded_range_checked:true,trilinear_support_mass_conserved:true,gaussian_mass_and_symmetry_checked:true,all_assets_below_25_MiB:true},null,2));
+for(const name of ['index.html','app.js','reconstruction-worker.js','vendor/three.module.js','vendor/three.core.js','vendor/addons/objects/MarchingCubes.js','slice-viewer.js','slice-viewer.css'])await stat(path.join(dist,name));
+console.log(JSON.stringify({status:'passed',original_png_hashes_checked:images,exact_float32_probability_arrays_checked:probs,unchanged_stl_hashes_and_triangle_counts_checked:stls,calibration_units_and_first_frame_transforms_checked:true,usable_frame_ranges_checked:true,no_displayed_frame_in_an_excluded_range_checked:true,trilinear_support_mass_conserved:true,gaussian_mass_and_symmetry_checked:true,slice_view_files_checked:sliceFiles,slice_masks_match_research_voxel_counts:true,all_assets_below_25_MiB:true},null,2));
